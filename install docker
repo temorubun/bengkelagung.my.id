@@ -10,4 +10,4 @@ sudo docker run -d -p 9443:9443 --name portainer --restart=always \
   portainer/portainer-ce:latest
 
 sudo docker ps
-https://bengkelagung.my.id:9443
+https://docker.bengkelagung.my.id
