@@ -10,4 +10,4 @@ sudo docker run -d -p 8181:9443 --name portainer --restart=always \
   portainer/portainer-ce:latest
 
 sudo docker ps
-https://IP_SERVER:8181
+https://bengkelagung.my.id:8181
