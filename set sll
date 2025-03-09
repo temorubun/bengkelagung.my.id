@@ -30,7 +30,7 @@ server {
     ssl_trusted_certificate /etc/letsencrypt/live/bengkelagung.my.id/chain.pem;
     
     location / {
-        proxy_pass http://localhost:3000/;
+        proxy_pass https://localhost:3000/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -47,7 +47,7 @@ server {
     ssl_trusted_certificate /etc/letsencrypt/live/docker.bengkelagung.my.id/chain.pem;
 
     location / {
-        proxy_pass http://localhost:9443/;
+        proxy_pass https://localhost:9443/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -64,7 +64,7 @@ server {
     ssl_trusted_certificate /etc/letsencrypt/live/ai.bengkelagung.my.id/chain.pem;
 
     location / {
-        proxy_pass http://localhost:5678/;
+        proxy_pass https://localhost:5678/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
