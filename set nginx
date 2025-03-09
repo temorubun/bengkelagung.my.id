@@ -4,4 +4,7 @@ sudo apt install certbot python3-certbot-nginx -y
 sudo certbot --nginx --cert-name bengkelagung.my.id -d bengkelagung.my.id -d docker.bengkelagung.my.id -d ai.bengkelagung.my.id
 
 
+sudo certbot --nginx -d bengkelagung.my.id 
+sudo certbot --nginx -d docker.bengkelagung.my.id 
+sudo certbot --nginx -d ai.bengkelagung.my.id
 
