@@ -5,7 +5,19 @@ sudo nano /etc/nginx/sites-available/bengkelagung
 
 server {
     listen 80;
-    server_name bengkelagung.my.id docker.bengkelagung.my.id ai.bengkelagung.my.id;
+    server_name bengkelagung.my.id;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 80;
+    server_name docker.bengkelagung.my.id;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 80;
+    server_name ai.bengkelagung.my.id;
     return 301 https://$host$request_uri;
 }
 
@@ -15,6 +27,7 @@ server {
 
     ssl_certificate /etc/letsencrypt/live/bengkelagung.my.id/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bengkelagung.my.id/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/bengkelagung.my.id/chain.pem;
     
     location / {
         proxy_pass http://localhost:3000/;
@@ -31,6 +44,7 @@ server {
 
     ssl_certificate /etc/letsencrypt/live/docker.bengkelagung.my.id/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/docker.bengkelagung.my.id/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/docker.bengkelagung.my.id/chain.pem;
 
     location / {
         proxy_pass http://localhost:9443/;
@@ -47,6 +61,7 @@ server {
 
     ssl_certificate /etc/letsencrypt/live/ai.bengkelagung.my.id/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/ai.bengkelagung.my.id/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/ai.bengkelagung.my.id/chain.pem;
 
     location / {
         proxy_pass http://localhost:5678/;
@@ -56,6 +71,8 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
+
+
 
 
 
