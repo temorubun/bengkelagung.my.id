@@ -1,7 +1,3 @@
-# Hentikan dan hapus container lama
-docker stop chatai
-docker rm chatai
-
 # Build image 
 docker build -t aplikasi1 .
 
