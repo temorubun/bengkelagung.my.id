@@ -7,5 +7,5 @@ docker run -d -p 3000:3000 --name app app
 # Restart nginx agar perubahan diterapkan
 sudo systemctl restart nginx
 
-docker logs app
+sudo docker logs app
 
