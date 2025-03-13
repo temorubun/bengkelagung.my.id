@@ -1,0 +1,159 @@
+CREATE TABLE profiles (
+    id SERIAL PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    status VARCHAR(50) NOT NULL DEFAULT 'OFFLINE',
+    last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO profiles (full_name, email, status, last_active) VALUES
+('Agung Hendi Temorubun', 'agunghenditemorubun@gmail.com', 'ONLINE', NOW());
+
+
+CREATE TABLE projects (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES profiles(id) ON DELETE CASCADE,
+    project_name VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL
+);
+
+INSERT INTO projects (id, user_id, project_name, description) VALUES
+(1, 1, 'hidroponik sp1', 'kebun hidroponik di sp1');
+
+
+CREATE TABLE devices (
+    id SERIAL PRIMARY KEY,
+    project_id INT REFERENCES projects(id) ON DELETE CASCADE,
+    device_name VARCHAR(100) NOT NULL,
+    device_type VARCHAR(100) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    uptime INTERVAL DEFAULT '0 seconds'
+);
+
+INSERT INTO devices (id, project_id, device_name, device_type, status, last_active, uptime) VALUES
+(1, 1, 'esp32 kangkung', 'esp32', 'aktif', NOW(), '0 seconds');
+
+
+CREATE TABLE device_logs (
+    id SERIAL PRIMARY KEY,
+    device_id INT REFERENCES devices(id) ON DELETE CASCADE,
+    status VARCHAR(50) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO device_logs (device_id, status) VALUES
+(1, 'ONLINE'),
+(1, 'OFFLINE');
+
+
+CREATE TABLE pins (
+    id SERIAL PRIMARY KEY,
+    pin_number INT NOT NULL UNIQUE,
+    pin_name VARCHAR(50) NOT NULL
+);
+
+INSERT INTO pins (pin_number, pin_name) VALUES
+(0, 'GPIO0'),
+(1, 'GPIO1'),
+(2, 'GPIO2'),
+(3, 'GPIO3'),
+(4, 'GPIO4'),
+(5, 'GPIO5'),
+(12, 'GPIO12'),
+(13, 'GPIO13'),
+(14, 'GPIO14'),
+(15, 'GPIO15'),
+(16, 'GPIO16'),
+(17, 'GPIO17'),
+(18, 'GPIO18'),
+(19, 'GPIO19'),
+(21, 'GPIO21'),
+(22, 'GPIO22'),
+(23, 'GPIO23'),
+(25, 'GPIO25'),
+(26, 'GPIO26'),
+(27, 'GPIO27'),
+(32, 'GPIO32'),
+(33, 'GPIO33'),
+(34, 'GPIO34'),
+(35, 'GPIO35'),
+(36, 'GPIO36'),
+(39, 'GPIO39');
+
+
+CREATE TABLE data_types (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(50) NOT NULL
+);
+
+INSERT INTO data_types (type) VALUES
+('ARRAY'),
+('BOOL'),
+('BYTE'),
+('CHAR'),
+('DOUBLE'),
+('FLOAT'),
+('INT'),
+('LONG'),
+('STRING'),
+('STRUCT'),
+('UNSIGNED INT'),
+('UNSIGNED LONG');
+
+
+CREATE TABLE signal_types (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(50) NOT NULL
+);
+
+INSERT INTO signal_types (type) VALUES
+('DIGITAL'),
+('ANALOG');
+
+
+CREATE TABLE modes (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(10) CHECK (type IN ('INPUT', 'OUTPUT')) NOT NULL
+);
+
+INSERT INTO modes (type) VALUES
+('INPUT'),
+('OUTPUT');
+
+
+CREATE TABLE pin_configuration (
+    id SERIAL PRIMARY KEY,
+    device_id INT REFERENCES devices(id) ON DELETE CASCADE,
+    pin_id INT REFERENCES pins(id) ON DELETE CASCADE,
+    data_type_id INT REFERENCES data_types(id) ON DELETE CASCADE,
+    signal_type_id INT REFERENCES signal_types(id) ON DELETE CASCADE,
+    mode_id INT REFERENCES modes(id) ON DELETE CASCADE,
+    state BOOLEAN DEFAULT FALSE,
+    status VARCHAR(50) NOT NULL DEFAULT 'INACTIVE'
+);
+
+INSERT INTO pin_configuration (device_id, pin_id, data_type_id, signal_type_id, mode_id, state, status) VALUES
+(1, 1, 3, 1, 2, FALSE, 'INACTIVE'),
+(1, 2, 2, 2, 1, FALSE, 'INACTIVE'),
+(1, 3, 3, 1, 2, FALSE, 'INACTIVE'),
+(1, 4, 1, 2, 1, FALSE, 'INACTIVE'),
+(1, 5, 1, 1, 2, FALSE, 'INACTIVE'),
+(1, 6, 3, 1, 2, FALSE, 'INACTIVE'),
+(1, 7, 3, 1, 2, FALSE, 'INACTIVE');
+
+
+CREATE TABLE pin_logs (
+    id SERIAL PRIMARY KEY,
+    device_id INT REFERENCES devices(id) ON DELETE CASCADE,
+    pin_id INT REFERENCES pins(id) ON DELETE CASCADE,
+    status VARCHAR(50) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO pin_logs (device_id, pin_id, status, timestamp) VALUES
+(1, 1, 'ON', NOW()),
+(1, 2, 'OFF', NOW()),
+(1, 3, 'ON', NOW()),
+(1, 4, 'OFF', NOW());
+
