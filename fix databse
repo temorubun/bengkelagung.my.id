@@ -1,0 +1,189 @@
+CREATE TABLE profiles (
+    profile_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
+    full_name VARCHAR(255) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'OFFLINE',
+    last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE projects (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    profile_id UUID REFERENCES profiles(profile_id) ON DELETE CASCADE,
+    project_name VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL
+);
+
+CREATE TABLE devices (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+    device_name VARCHAR(100) NOT NULL,
+    device_type VARCHAR(100) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    uptime INTERVAL DEFAULT '0 seconds',
+    description TEXT NOT NULL
+);
+
+CREATE TABLE device_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id UUID REFERENCES devices(id) ON DELETE CASCADE,
+    status VARCHAR(50) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE pins (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    pin_number INT NOT NULL UNIQUE,
+    pin_name VARCHAR(50) NOT NULL
+);
+INSERT INTO pins (id, pin_number, pin_name) VALUES
+(gen_random_uuid(), 0, 'GPIO0'),
+(gen_random_uuid(), 1, 'GPIO1'),
+(gen_random_uuid(), 2, 'GPIO2'),
+(gen_random_uuid(), 3, 'GPIO3'),
+(gen_random_uuid(), 4, 'GPIO4'),
+(gen_random_uuid(), 5, 'GPIO5'),
+(gen_random_uuid(), 12, 'GPIO12'),
+(gen_random_uuid(), 13, 'GPIO13'),
+(gen_random_uuid(), 14, 'GPIO14'),
+(gen_random_uuid(), 15, 'GPIO15'),
+(gen_random_uuid(), 16, 'GPIO16'),
+(gen_random_uuid(), 17, 'GPIO17'),
+(gen_random_uuid(), 18, 'GPIO18'),
+(gen_random_uuid(), 19, 'GPIO19'),
+(gen_random_uuid(), 21, 'GPIO21'),
+(gen_random_uuid(), 22, 'GPIO22'),
+(gen_random_uuid(), 23, 'GPIO23'),
+(gen_random_uuid(), 25, 'GPIO25'),
+(gen_random_uuid(), 26, 'GPIO26'),
+(gen_random_uuid(), 27, 'GPIO27'),
+(gen_random_uuid(), 32, 'GPIO32'),
+(gen_random_uuid(), 33, 'GPIO33'),
+(gen_random_uuid(), 34, 'GPIO34'),
+(gen_random_uuid(), 35, 'GPIO35'),
+(gen_random_uuid(), 36, 'GPIO36'),
+(gen_random_uuid(), 39, 'GPIO39');
+
+
+CREATE TABLE data_types (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type VARCHAR(50) NOT NULL
+);
+INSERT INTO data_types (id, type) VALUES
+(gen_random_uuid(), 'ARRAY'),
+(gen_random_uuid(), 'BOOL'),
+(gen_random_uuid(), 'BYTE'),
+(gen_random_uuid(), 'CHAR'),
+(gen_random_uuid(), 'DOUBLE'),
+(gen_random_uuid(), 'FLOAT'),
+(gen_random_uuid(), 'INT'),
+(gen_random_uuid(), 'LONG'),
+(gen_random_uuid(), 'STRING'),
+(gen_random_uuid(), 'STRUCT'),
+(gen_random_uuid(), 'UNSIGNED INT'),
+(gen_random_uuid(), 'UNSIGNED LONG');
+
+
+CREATE TABLE signal_types (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type VARCHAR(50) NOT NULL
+);
+INSERT INTO signal_types (id, type) VALUES
+(gen_random_uuid(), 'DIGITAL'),
+(gen_random_uuid(), 'ANALOG');
+
+
+CREATE TABLE modes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type VARCHAR(10) CHECK (type IN ('INPUT', 'OUTPUT')) NOT NULL
+);
+INSERT INTO modes (id, type) VALUES
+(gen_random_uuid(), 'INPUT'),
+(gen_random_uuid(), 'OUTPUT');
+
+
+CREATE TABLE pin_configuration (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id UUID REFERENCES devices(id) ON DELETE CASCADE,
+    pin_id UUID REFERENCES pins(id) ON DELETE CASCADE,
+    data_type_id UUID REFERENCES data_types(id) ON DELETE CASCADE,
+    signal_type_id UUID REFERENCES signal_types(id) ON DELETE CASCADE,
+    mode_id UUID REFERENCES modes(id) ON DELETE CASCADE,
+    state BOOLEAN DEFAULT FALSE,
+    status VARCHAR(50) NOT NULL DEFAULT 'INACTIVE'
+);
+
+CREATE TABLE setting (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    key VARCHAR(255) UNIQUE NOT NULL,
+    value TEXT NOT NULL,
+    description TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES profiles(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_setting (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL UNIQUE,
+    nama_lengkap VARCHAR(255) NOT NULL,
+    nomor_hp VARCHAR(20) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    foto_user TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES profiles(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE webhook_setting (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    webhook_url TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES profiles(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE target_setting (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    target_ph DECIMAL(5,2) NOT NULL,
+    target_suhu DECIMAL(5,2) NOT NULL,
+    target_kelembaban DECIMAL(5,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES profiles(user_id) ON DELETE CASCADE
+);
+
+-- Trigger untuk memperbarui updated_at otomatis
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_timestamp_setting
+BEFORE UPDATE ON setting
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+CREATE TRIGGER set_timestamp_user_setting
+BEFORE UPDATE ON user_setting
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+CREATE TRIGGER set_timestamp_webhook_setting
+BEFORE UPDATE ON webhook_setting
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+CREATE TRIGGER set_timestamp_target_setting
+BEFORE UPDATE ON target_setting
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+
+
