@@ -3,6 +3,7 @@ sudo nano /etc/nginx/sites-available/bengkelagung
 
 
 
+
 server {
     listen 80;
     server_name bengkelagung.my.id;
@@ -15,9 +16,9 @@ server {
     ssl_certificate /etc/letsencrypt/live/bengkelagung.my.id/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bengkelagung.my.id/privkey.pem;
     ssl_trusted_certificate /etc/letsencrypt/live/bengkelagung.my.id/chain.pem;
-    
+
     location / {
-        proxy_pass https://localhost:3000/;
+        proxy_pass http://localhost:3000/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -58,9 +59,9 @@ server {
     listen 443 ssl;
     server_name ai.bengkelagung.my.id;
 
-    ssl_certificate /etc/letsencrypt/live/ai.bengkelagung.my.id/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/ai.bengkelagung.my.id/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/ai.bengkelagung.my.id/chain.pem;
+    #ssl_certificate /etc/letsencrypt/live/ai.bengkelagung.my.id/fullchain.pem;
+    #ssl_certificate_key /etc/letsencrypt/live/ai.bengkelagung.my.id/privkey.pem;
+    #ssl_trusted_certificate /etc/letsencrypt/live/ai.bengkelagung.my.id/chain.pem;
 
     location / {
         proxy_pass http://localhost:5678/;
@@ -68,6 +69,11 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Tambahkan WebSocket Support
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+
     }
 }
 
