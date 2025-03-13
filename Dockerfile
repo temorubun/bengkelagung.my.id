@@ -16,8 +16,8 @@ COPY . .
 # Build aplikasi (jika menggunakan Vite atau framework lain)
 RUN npm run build
 
-# Expose port 4000 agar sesuai dengan konfigurasi nginx
-EXPOSE 4000
+# Expose port 3000 agar sesuai dengan konfigurasi nginx
+EXPOSE 3000
 
-# Perintah untuk menjalankan aplikasi dengan port 4000
-CMD ["npm", "run", "preview", "--", "--port", "4000"]
+# Perintah untuk menjalankan aplikasi dengan port 3000
+CMD ["npm", "run", "preview", "--", "--port", "3000"]
