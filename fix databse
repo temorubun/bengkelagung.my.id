@@ -102,6 +102,19 @@ INSERT INTO modes (id, type) VALUES
 (gen_random_uuid(), 'OUTPUT');
 
 
+CREATE TABLE label (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
+INSERT INTO label (name) VALUES 
+('pH'),
+('Suhu'),
+('Kelembaban'),
+('Pompa'),
+('Lampu'),
+('Level Air');
+
+
 CREATE TABLE pin_configuration (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     device_id UUID REFERENCES devices(id) ON DELETE CASCADE,
@@ -109,9 +122,11 @@ CREATE TABLE pin_configuration (
     data_type_id UUID REFERENCES data_types(id) ON DELETE CASCADE,
     signal_type_id UUID REFERENCES signal_types(id) ON DELETE CASCADE,
     mode_id UUID REFERENCES modes(id) ON DELETE CASCADE,
+    label_id INT REFERENCES label(id) ON DELETE SET NULL,
     state BOOLEAN DEFAULT FALSE,
     status VARCHAR(50) NOT NULL DEFAULT 'INACTIVE'
 );
+
 
 CREATE TABLE pin_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
